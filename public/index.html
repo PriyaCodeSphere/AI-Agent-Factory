@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Live MRP exception management agent demonstration" />
+    <title>MRP Agent Control Room</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="topbar">
+        <a class="brand" href="/" aria-label="MRP Agent Control Room home">
+          <span class="brand-mark">M</span>
+          <span><b>MRP</b> Agent Control Room</span>
+        </a>
+        <div class="system-state" id="system-state"><span class="state-dot"></span><span>Checking system</span></div>
+      </header>
+
+      <main>
+        <section class="hero">
+          <div>
+            <p class="eyebrow">END-TO-END EXCEPTION MANAGEMENT</p>
+            <h1>Watch the planning network<br /><em>resolve itself.</em></h1>
+            <p class="hero-copy">Run a real agent workflow against a governed mock ERP. Every decision, tool call, human gate, and guardrail appears live.</p>
+          </div>
+          <div class="hero-stat">
+            <span>Digital personas</span><strong>16</strong><small>One controlled workflow</small>
+          </div>
+        </section>
+
+        <section class="scenario-section" aria-labelledby="scenario-title">
+          <div class="section-heading">
+            <div><p class="eyebrow">01 / SELECT A SCENARIO</p><h2 id="scenario-title">Choose the operating lane</h2></div>
+            <p>Each run uses live model reasoning. Typical duration: 20–40 seconds.</p>
+          </div>
+
+          <div class="scenario-grid" id="scenario-grid">
+            <button class="scenario-card selected" data-lane="lane-a" type="button">
+              <span class="card-top"><span class="lane-tag autonomous">LANE A</span><span class="radio"></span></span>
+              <strong>Autonomous resolution</strong>
+              <span>Agents identify and apply a documented substitute without human intervention.</span>
+              <small>EX-77301 · HYD-PUMP-3045</small>
+            </button>
+            <button class="scenario-card" data-lane="lane-b" type="button">
+              <span class="card-top"><span class="lane-tag governed">LANE B</span><span class="radio"></span></span>
+              <strong>Governed resolution</strong>
+              <span>A new substitution reaches the mandatory engineering decision gate.</span>
+              <small>EX-77302 · CAST-7781-GY</small>
+            </button>
+            <button class="scenario-card" data-lane="refusal" type="button">
+              <span class="card-top"><span class="lane-tag refusal">REFUSAL</span><span class="radio"></span></span>
+              <strong>Guardrail in action</strong>
+              <span>Stale availability data forces an agent to decline and escalate safely.</span>
+              <small>EX-77340 · BRG-5520-HD</small>
+            </button>
+          </div>
+
+          <div class="run-controls">
+            <label id="decision-control">Engineering decision
+              <select id="human-decision">
+                <option value="approved">Approve substitution</option>
+                <option value="changes_requested">Request changes</option>
+                <option value="rejected">Reject substitution</option>
+              </select>
+            </label>
+            <button class="run-button" id="run-button" type="button"><span>Run live scenario</span><span aria-hidden="true">→</span></button>
+          </div>
+        </section>
+
+        <section class="execution" aria-labelledby="execution-title">
+          <div class="section-heading compact">
+            <div><p class="eyebrow">02 / LIVE EXECUTION</p><h2 id="execution-title">Workflow trace</h2></div>
+            <button class="clear-button" id="clear-button" type="button">Clear trace</button>
+          </div>
+
+          <div class="metrics" id="metrics">
+            <div><span>Agent turns</span><strong id="metric-agents">—</strong></div>
+            <div><span>ERP tool calls</span><strong id="metric-tools">—</strong></div>
+            <div><span>Human gates</span><strong id="metric-gates">—</strong></div>
+            <div><span>Escalations</span><strong id="metric-escalations">—</strong></div>
+            <div><span>Agent time</span><strong id="metric-time">—</strong></div>
+          </div>
+
+          <div class="trace-panel">
+            <div class="trace-header"><span><i></i>LIVE EVENT STREAM</span><span id="run-status">Ready</span></div>
+            <div class="empty-state" id="empty-state"><span class="pulse-icon">◎</span><strong>Ready to orchestrate</strong><p>Select a scenario and start the run. The trace will appear here as agents work.</p></div>
+            <div class="timeline" id="timeline" aria-live="polite"></div>
+          </div>
+        </section>
+      </main>
+
+      <footer><span>MRP Exception Management Agentic Demo</span><span>Guardrails by design · Human authority preserved</span></footer>
+    </div>
+    <script src="/app.js" defer></script>
+  </body>
+</html>

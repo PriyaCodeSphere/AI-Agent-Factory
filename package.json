@@ -1,0 +1,29 @@
+{
+  "name": "mrp-agent-demo",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Agentic demo for End-to-End MRP Exception Management and Replanning (AGCO)",
+  "engines": {
+    "node": ">=23.6"
+  },
+  "scripts": {
+    "start": "node --env-file-if-exists=.env src/server.ts",
+    "web": "node --env-file-if-exists=.env src/server.ts",
+    "selftest": "node --env-file-if-exists=.env src/cli.ts selftest",
+    "lane-a": "node --env-file-if-exists=.env src/cli.ts lane-a",
+    "lane-b": "node --env-file-if-exists=.env src/cli.ts lane-b",
+    "lane-b-reject": "node --env-file-if-exists=.env src/cli.ts lane-b --reject",
+    "refusal": "node --env-file-if-exists=.env src/cli.ts refusal",
+    "all": "node --env-file-if-exists=.env src/cli.ts all",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "openai": "^7.32.0",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.7.2"
+  }
+}

@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: mrp-agent-demo
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /healthz
+    envVars:
+      - key: NODE_VERSION
+        value: 26.4.0
+      - key: AZURE_OPENAI_ENDPOINT
+        sync: false
+      - key: AZURE_OPENAI_API_KEY
+        sync: false
+      - key: AZURE_OPENAI_CHAT_DEPLOYMENT
+        sync: false
+      - key: AZURE_OPENAI_API_VERSION
+        value: 2025-01-01-preview
+      - key: AZURE_OPENAI_REASONING
+        value: "false"
+      - key: DEMO_USERNAME
+        value: demo
+      - key: DEMO_PASSWORD
+        sync: false
