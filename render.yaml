@@ -3,7 +3,7 @@ services:
     name: mrp-agent-demo
     runtime: node
     plan: free
-    buildCommand: npm install
+    buildCommand: pnpm install --frozen-lockfile
     startCommand: npm start
     healthCheckPath: /healthz
     envVars:
@@ -19,7 +19,3 @@ services:
         value: 2025-01-01-preview
       - key: AZURE_OPENAI_REASONING
         value: "false"
-      - key: DEMO_USERNAME
-        value: demo
-      - key: DEMO_PASSWORD
-        sync: false

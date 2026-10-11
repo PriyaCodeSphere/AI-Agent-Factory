@@ -4,6 +4,9 @@ A working demo of the agent design in `end-to-end-mrp-exception-management-and-r
 
 One material shortage travels end to end through all 16 agents in the BRD against a mock multi-ERP backend. Nothing is scripted: the agents genuinely read the ERP data, genuinely choose one of nine corrective paths, and genuinely decline when a guardrail forbids the action.
 
+For a practical team handoff covering the shared URL, scenario walkthroughs,
+code map, change patterns, and verification checklist, see [TEAM_GUIDE.md](TEAM_GUIDE.md).
+
 ## Setup
 
 Requires **Node 23.6+** (it runs TypeScript natively — no build step).
@@ -49,7 +52,7 @@ The included `render.yaml` is ready for a Render Blueprint deployment:
 1. Push this folder to a Git repository.
 2. In Render, choose **New > Blueprint** and connect the repository.
 3. Enter the secret values requested by the Blueprint: `AZURE_OPENAI_ENDPOINT`,
-   `AZURE_OPENAI_API_KEY`, `AZURE_OPENAI_CHAT_DEPLOYMENT`, and `DEMO_PASSWORD`.
+   `AZURE_OPENAI_API_KEY`, and `AZURE_OPENAI_CHAT_DEPLOYMENT`.
 4. Deploy and open the `onrender.com` URL Render assigns.
 
 Do not commit `.env`; it is already excluded by `.gitignore`. Rotate any Azure key that has been pasted
