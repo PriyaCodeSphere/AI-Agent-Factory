@@ -43,6 +43,17 @@ displays the engineering decision package, and waits for a person to approve, re
 before the workflow can continue. Azure credentials remain on the server and are never sent to the browser.
 Runs are serialised because the demo ERP is intentionally an in-memory fixture.
 
+The customer experience has two connected views:
+
+- **Build from BRD** explains how the source process becomes 35 functional requirements, 16 focused
+  agent personas, bounded tool access, NFR guardrails, escalation rules, deterministic routing, and one
+  retained human approval. Select any agent to inspect the production contract loaded from the live registry.
+- **Run workflow** demonstrates those contracts in operation. The trace separates model reasoning, tool
+  calls, workflow decisions, guardrail escalations, and the interactive FR-10 engineering gate.
+
+For a customer walkthrough, start with requirement lineage, inspect the corrective-action and engineering
+preparation agents, explain the production-target controls, then open Lane B to demonstrate the human gate.
+
 Set `PORT` to use a port other than 3000. For a shared deployment, set `DEMO_PASSWORD` and optionally
 `DEMO_USERNAME` (defaults to `demo`) to protect the site with browser Basic Authentication.
 

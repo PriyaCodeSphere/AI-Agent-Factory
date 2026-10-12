@@ -3,6 +3,7 @@ import { createServer, type IncomingMessage, type ServerResponse } from "node:ht
 import { timingSafeEqual } from "node:crypto";
 import { fileURLToPath } from "node:url";
 
+import { ALL_AGENTS } from "./agents/registry.ts";
 import type { HumanDecision, HumanDecisionPackage, LaneResult } from "./orchestrator.ts";
 import { runLane, type LaneName } from "./scenarios.ts";
 import {
@@ -172,6 +173,37 @@ const server = createServer(async (req, res) => {
       configured: endpoint && apiKey && Boolean(deployment),
       deployment: deployment ?? null,
       activeRunId: activeRunId ?? null,
+    });
+    return;
+  }
+
+  if (req.method === "GET" && url.pathname === "/api/blueprint") {
+    sendJson(res, 200, {
+      source: {
+        title: "End-to-End MRP Exception Management and Replanning",
+        status: "Generated for review",
+        currentSteps: 24,
+        manualSteps: 16,
+        functionalRequirements: 35,
+        businessRules: 2,
+        humanGates: 1,
+      },
+      agents: ALL_AGENTS.map((agent) => ({
+        name: agent.name,
+        fr: agent.fr,
+        mission: agent.mission,
+        autonomy: agent.autonomy,
+        confidence: agent.confidence,
+        effort: agent.effort,
+        guardrails: agent.guardrails,
+        escalation: agent.escalation,
+        tools: agent.tools.map((tool) => ({ name: tool.name, description: tool.description })),
+      })),
+      controls: [
+        { id: "BR-01", label: "Corrective-path routing", owner: "Workflow service" },
+        { id: "FR-10", label: "New-substitution approval", owner: "Engineering" },
+        { id: "BR-02", label: "Outcome routing", owner: "Workflow service" },
+      ],
     });
     return;
   }

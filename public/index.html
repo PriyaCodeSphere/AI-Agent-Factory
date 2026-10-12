@@ -3,107 +3,62 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Live MRP exception management agent demonstration" />
-    <title>MRP Agent Control Room</title>
+    <meta name="description" content="BRD-to-production MRP agent demonstration" />
+    <title>MRP Agent Factory</title>
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
     <div class="page-shell">
       <header class="topbar">
-        <a class="brand" href="/" aria-label="MRP Agent Control Room home">
-          <span class="brand-mark">M</span>
-          <span><b>MRP</b> Agent Control Room</span>
-        </a>
+        <a class="brand" href="/" aria-label="MRP Agent Factory home"><span class="brand-mark">M</span><span><b>MRP</b> Agent Factory</span></a>
+        <nav class="view-switcher" aria-label="Demo view"><button class="view-tab active" data-view="factory" type="button">Build from BRD</button><button class="view-tab" data-view="runtime" type="button">Run workflow</button></nav>
         <div class="system-state" id="system-state"><span class="state-dot"></span><span>Checking system</span></div>
       </header>
-
       <main>
-        <section class="hero">
-          <div>
-            <p class="eyebrow">END-TO-END EXCEPTION MANAGEMENT</p>
-            <h1>Watch the planning network<br /><em>resolve itself.</em></h1>
-            <p class="hero-copy">Run a real agent workflow against a governed mock ERP. Every decision, tool call, human gate, and guardrail appears live.</p>
-          </div>
-          <div class="hero-stat">
-            <span>Digital personas</span><strong>16</strong><small>One controlled workflow</small>
-          </div>
-        </section>
-
-        <section class="scenario-section" aria-labelledby="scenario-title">
-          <div class="section-heading">
-            <div><p class="eyebrow">01 / SELECT A SCENARIO</p><h2 id="scenario-title">Choose the operating lane</h2></div>
-            <p>Each run uses live model reasoning. Typical duration: 20–40 seconds.</p>
-          </div>
-
-          <div class="scenario-grid" id="scenario-grid">
-            <button class="scenario-card selected" data-lane="lane-a" type="button">
-              <span class="card-top"><span class="lane-tag autonomous">LANE A</span><span class="radio"></span></span>
-              <strong>Autonomous resolution</strong>
-              <span>Agents identify and apply a documented substitute without human intervention.</span>
-              <small>EX-77301 · HYD-PUMP-3045</small>
-            </button>
-            <button class="scenario-card" data-lane="lane-b" type="button">
-              <span class="card-top"><span class="lane-tag governed">LANE B</span><span class="radio"></span></span>
-              <strong>Governed resolution</strong>
-              <span>A new substitution reaches the mandatory engineering decision gate.</span>
-              <small>EX-77302 · CAST-7781-GY</small>
-            </button>
-            <button class="scenario-card" data-lane="refusal" type="button">
-              <span class="card-top"><span class="lane-tag refusal">REFUSAL</span><span class="radio"></span></span>
-              <strong>Guardrail in action</strong>
-              <span>Stale availability data forces an agent to decline and escalate safely.</span>
-              <small>EX-77340 · BRG-5520-HD</small>
-            </button>
-          </div>
-
-          <div class="run-controls">
-            <button class="run-button" id="run-button" type="button"><span>Run live scenario</span><span aria-hidden="true">→</span></button>
-          </div>
-        </section>
-
-        <section class="execution" aria-labelledby="execution-title">
-          <div class="section-heading compact">
-            <div><p class="eyebrow">02 / LIVE EXECUTION</p><h2 id="execution-title">Workflow trace</h2></div>
-            <button class="clear-button" id="clear-button" type="button">Clear trace</button>
-          </div>
-
-          <div class="metrics" id="metrics">
-            <div><span>Agent turns</span><strong id="metric-agents">—</strong></div>
-            <div><span>ERP tool calls</span><strong id="metric-tools">—</strong></div>
-            <div><span>Human gates</span><strong id="metric-gates">—</strong></div>
-            <div><span>Escalations</span><strong id="metric-escalations">—</strong></div>
-            <div><span>Agent time</span><strong id="metric-time">—</strong></div>
-          </div>
-
-          <section class="approval-panel" id="approval-panel" aria-labelledby="approval-title" hidden>
-            <div class="approval-heading">
-              <div><p class="eyebrow">FR-10 / HUMAN DECISION</p><h3 id="approval-title">Engineering approval required</h3></div>
-              <span class="approval-state">Workflow paused</span>
-            </div>
-            <dl class="decision-package">
-              <div><dt>Exception</dt><dd id="approval-exception"></dd></div>
-              <div><dt>Affected material</dt><dd id="approval-material"></dd></div>
-              <div><dt>Proposed substitute</dt><dd id="approval-substitute"></dd></div>
-              <div class="wide"><dt>Engineering evidence</dt><dd id="approval-support"></dd></div>
-              <div class="wide"><dt>Items for engineering review</dt><dd><ul id="approval-gaps"></ul></dd></div>
-            </dl>
-            <div class="approval-actions">
-              <button class="decision-button reject" data-decision="rejected" type="button">Reject</button>
-              <button class="decision-button changes" data-decision="changes_requested" type="button">Request changes</button>
-              <button class="decision-button approve" data-decision="approved" type="button">Approve</button>
-            </div>
-            <p class="approval-error" id="approval-error" role="alert"></p>
+        <div class="view-panel" id="factory-view">
+          <section class="hero factory-hero">
+            <div><p class="eyebrow">BRD TO PRODUCTION BLUEPRINT</p><h1>MRP Agent Factory</h1><p class="hero-copy">See how business requirements become specialized agents with bounded tools, explicit guardrails, human authority, and a production workflow.</p><button class="primary-link" id="explore-agents" type="button">Explore the agent workforce</button></div>
+            <div class="hero-stat"><span>Traceable personas</span><strong>16</strong><small>Derived from 35 requirements</small></div>
           </section>
-
-          <div class="trace-panel">
-            <div class="trace-header"><span><i></i>LIVE EVENT STREAM</span><span id="run-status">Ready</span></div>
-            <div class="empty-state" id="empty-state"><span class="pulse-icon">◎</span><strong>Ready to orchestrate</strong><p>Select a scenario and start the run. The trace will appear here as agents work.</p></div>
-            <div class="timeline" id="timeline" aria-live="polite"></div>
-          </div>
-        </section>
+          <section class="brd-summary" aria-labelledby="lineage-title">
+            <div class="section-heading"><div><p class="eyebrow">01 / REQUIREMENT LINEAGE</p><h2 id="lineage-title">From process document to executable design</h2></div><p>Every persona, permission, control, and integration traces back to the reviewed business requirements.</p></div>
+            <div class="brd-metrics"><div><strong>24</strong><span>Current-state steps</span></div><div><strong>16</strong><span>Manual activities</span></div><div><strong>35</strong><span>Functional requirements</span></div><div><strong>2</strong><span>Business rules</span></div><div><strong>1</strong><span>Human approval gate</span></div></div>
+            <ol class="build-pipeline">
+              <li><span>1</span><div><strong>Discover</strong><p>Read process steps, roles, decisions, systems, and acceptance criteria.</p></div></li><li><span>2</span><div><strong>Design</strong><p>Turn agentified requirements into focused personas with clear missions.</p></div></li><li><span>3</span><div><strong>Govern</strong><p>Bind NFR guardrails, escalation routes, autonomy, and human approvals.</p></div></li><li><span>4</span><div><strong>Connect</strong><p>Expose only the ERP and engineering tools each persona needs.</p></div></li><li><span>5</span><div><strong>Orchestrate</strong><p>Route agents with deterministic rules and observable workflow state.</p></div></li>
+            </ol>
+          </section>
+          <section class="agent-workforce" id="agent-workforce" aria-labelledby="workforce-title">
+            <div class="section-heading compact"><div><p class="eyebrow">02 / AGENT WORKFORCE</p><h2 id="workforce-title">Inspect the production contract</h2></div><div class="agent-filters" aria-label="Filter agents"><button class="filter-button active" data-filter="all" type="button">All</button><button class="filter-button" data-filter="full" type="button">Full</button><button class="filter-button" data-filter="assisted" type="button">Assisted</button><button class="filter-button" data-filter="partial" type="button">Partial</button></div></div>
+            <div class="agent-browser"><div class="agent-list" id="agent-list" role="list"></div><article class="agent-detail" id="agent-detail" aria-live="polite"><div class="detail-empty">Loading agent definitions from the runtime registry...</div></article></div>
+          </section>
+          <section class="workflow-blueprint" aria-labelledby="blueprint-title">
+            <div class="section-heading"><div><p class="eyebrow">03 / CONTROLLED ORCHESTRATION</p><h2 id="blueprint-title">How the production workflow operates</h2></div><button class="run-button compact-button" id="open-runtime" type="button"><span>Open live workflow</span><span aria-hidden="true">&rarr;</span></button></div>
+            <div class="workflow-track"><div><span>FR-01</span><strong>Plan</strong><small>Execute plant MRP</small></div><div><span>FR-02</span><strong>Triage</strong><small>Prioritize exceptions</small></div><div><span>FR-03</span><strong>Recommend</strong><small>Evaluate nine paths</small></div><div class="control-node"><span>BR-01</span><strong>Route</strong><small>Deterministic control</small></div><div><span>FR-05-16</span><strong>Correct</strong><small>Execute selected action</small></div><div class="human-node"><span>FR-10</span><strong>Human gate</strong><small>When substitution is new</small></div><div><span>FR-17-19</span><strong>Replan</strong><small>Update, rerun, validate</small></div><div class="control-node"><span>BR-02</span><strong>Close</strong><small>Resolve or escalate</small></div></div>
+          </section>
+          <section class="production-model" aria-labelledby="production-title">
+            <div class="section-heading"><div><p class="eyebrow">04 / PRODUCTIONIZATION</p><h2 id="production-title">From demonstration to operating service</h2></div><p>The agent contracts move forward while infrastructure, identity, integrations, and operational controls mature around them.</p></div>
+            <div class="production-grid"><div><span class="state-label current">Demo today</span><strong>Governed simulation</strong><p>Live model reasoning, mock ERP data, auditable traces, deterministic routing, and interactive approval.</p></div><div><span class="state-label target">Production target</span><strong>Enterprise runtime</strong><p>Managed identities, isolated workflow state, durable queues, retries, secrets, and role-based approval.</p></div><div><span class="state-label target">Production target</span><strong>System integration</strong><p>Validated connectors for ERP, supplier, engineering, and planning services with controlled writes.</p></div><div><span class="state-label target">Production target</span><strong>Operations and assurance</strong><p>Evaluation suites, observability, cost controls, audit retention, alerts, and human escalation SLAs.</p></div></div>
+          </section>
+        </div>
+        <div class="view-panel" id="runtime-view" hidden>
+          <section class="runtime-intro"><div><p class="eyebrow">PRODUCTION WORKFLOW SIMULATION</p><h1>MRP Workflow Control Room</h1><p class="hero-copy">Run the governed workflow. Agents reason with bounded tools while deterministic services own routing, approvals, and terminal outcomes.</p></div><div class="runtime-badges"><span>Live reasoning</span><span>Mock ERP</span><span>Audited events</span></div></section>
+          <section class="scenario-section" aria-labelledby="scenario-title">
+            <div class="section-heading"><div><p class="eyebrow">01 / SELECT A SCENARIO</p><h2 id="scenario-title">Choose the operating lane</h2></div><p>Each run uses live model reasoning. Typical duration: 20-40 seconds.</p></div>
+            <div class="scenario-grid" id="scenario-grid">
+              <button class="scenario-card selected" data-lane="lane-a" type="button"><span class="card-top"><span class="lane-tag autonomous">LANE A</span><span class="radio"></span></span><strong>Autonomous resolution</strong><span>Agents identify and apply a documented substitute without human intervention.</span><small>EX-77301 / HYD-PUMP-3045</small></button>
+              <button class="scenario-card" data-lane="lane-b" type="button"><span class="card-top"><span class="lane-tag governed">LANE B</span><span class="radio"></span></span><strong>Governed resolution</strong><span>A new substitution reaches the mandatory engineering decision gate.</span><small>EX-77302 / CAST-7781-GY</small></button>
+              <button class="scenario-card" data-lane="refusal" type="button"><span class="card-top"><span class="lane-tag refusal">REFUSAL</span><span class="radio"></span></span><strong>Guardrail in action</strong><span>Stale availability data forces an agent to decline and escalate safely.</span><small>EX-77340 / BRG-5520-HD</small></button>
+            </div><div class="run-controls"><button class="run-button" id="run-button" type="button"><span>Run live scenario</span><span aria-hidden="true">&rarr;</span></button></div>
+          </section>
+          <section class="execution" aria-labelledby="execution-title">
+            <div class="section-heading compact"><div><p class="eyebrow">02 / LIVE EXECUTION</p><h2 id="execution-title">Workflow trace</h2></div><button class="clear-button" id="clear-button" type="button">Clear trace</button></div>
+            <div class="metrics" id="metrics"><div><span>Agent turns</span><strong id="metric-agents">-</strong></div><div><span>ERP tool calls</span><strong id="metric-tools">-</strong></div><div><span>Human gates</span><strong id="metric-gates">-</strong></div><div><span>Escalations</span><strong id="metric-escalations">-</strong></div><div><span>Agent time</span><strong id="metric-time">-</strong></div></div>
+            <section class="approval-panel" id="approval-panel" aria-labelledby="approval-title" hidden><div class="approval-heading"><div><p class="eyebrow">FR-10 / HUMAN DECISION</p><h3 id="approval-title">Engineering approval required</h3></div><span class="approval-state">Workflow paused</span></div><dl class="decision-package"><div><dt>Exception</dt><dd id="approval-exception"></dd></div><div><dt>Affected material</dt><dd id="approval-material"></dd></div><div><dt>Proposed substitute</dt><dd id="approval-substitute"></dd></div><div class="wide"><dt>Engineering evidence</dt><dd id="approval-support"></dd></div><div class="wide"><dt>Items for engineering review</dt><dd><ul id="approval-gaps"></ul></dd></div></dl><div class="approval-actions"><button class="decision-button reject" data-decision="rejected" type="button">Reject</button><button class="decision-button changes" data-decision="changes_requested" type="button">Request changes</button><button class="decision-button approve" data-decision="approved" type="button">Approve</button></div><p class="approval-error" id="approval-error" role="alert"></p></section>
+            <div class="trace-panel"><div class="trace-header"><span><i></i>LIVE EVENT STREAM</span><span id="run-status">Ready</span></div><div class="empty-state" id="empty-state"><span class="pulse-icon">O</span><strong>Ready to orchestrate</strong><p>Select a scenario and start the run. The trace will appear here as agents work.</p></div><div class="timeline" id="timeline" aria-live="polite"></div></div>
+          </section>
+        </div>
       </main>
-
-      <footer><span>MRP Exception Management Agentic Demo</span><span>Guardrails by design · Human authority preserved</span></footer>
+      <footer><span>MRP Agent Factory</span><span>Requirements traced / Controls enforced / Human authority preserved</span></footer>
     </div>
     <script src="/app.js" defer></script>
   </body>
