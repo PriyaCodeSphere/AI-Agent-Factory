@@ -3,7 +3,7 @@ import { createServer, type IncomingMessage, type ServerResponse } from "node:ht
 import { timingSafeEqual } from "node:crypto";
 import { fileURLToPath } from "node:url";
 
-import type { HumanDecision, LaneResult } from "./orchestrator.ts";
+import type { HumanDecision, HumanDecisionPackage, LaneResult } from "./orchestrator.ts";
 import { runLane, type LaneName } from "./scenarios.ts";
 import {
   estimateCostUsd,
@@ -22,8 +22,7 @@ const decisions = new Set<HumanDecision>(["approved", "changes_requested", "reje
 interface RunRecord {
   id: string;
   lane: LaneName;
-  humanDecision: HumanDecision;
-  status: "queued" | "running" | "completed" | "failed";
+  status: "queued" | "running" | "awaiting_approval" | "completed" | "failed";
   startedAt: string;
   finishedAt?: string;
   events: TraceEvent[];
@@ -32,6 +31,8 @@ interface RunRecord {
   estimatedCostUsd?: number | null;
   error?: string;
   clients: Set<ServerResponse>;
+  decisionPackage?: HumanDecisionPackage;
+  resolveDecision?: (decision: HumanDecision) => void;
 }
 
 const runs = new Map<string, RunRecord>();
@@ -97,7 +98,16 @@ async function executeRun(run: RunRecord): Promise<void> {
   });
 
   try {
-    run.result = await runLane(run.lane, run.humanDecision);
+    run.result = await runLane(run.lane, undefined, undefined, async (decisionPackage) => {
+      run.decisionPackage = decisionPackage;
+      run.status = "awaiting_approval";
+      broadcast(run, "status", { status: run.status });
+      broadcast(run, "approval_required", decisionPackage);
+
+      return new Promise<HumanDecision>((resolve) => {
+        run.resolveDecision = resolve;
+      });
+    });
     run.summary = summarise();
     run.estimatedCostUsd = estimateCostUsd(run.summary) ?? null;
     run.status = "completed";
@@ -172,14 +182,9 @@ const server = createServer(async (req, res) => {
       return;
     }
     try {
-      const body = (await readJson(req)) as { lane?: LaneName; humanDecision?: HumanDecision };
+      const body = (await readJson(req)) as { lane?: LaneName };
       if (!body.lane || !lanes.has(body.lane)) {
         sendJson(res, 400, { error: "lane must be lane-a, lane-b, or refusal" });
-        return;
-      }
-      const humanDecision = body.humanDecision ?? "approved";
-      if (!decisions.has(humanDecision)) {
-        sendJson(res, 400, { error: "humanDecision must be approved, changes_requested, or rejected" });
         return;
       }
       if (!process.env.AZURE_OPENAI_ENDPOINT || !process.env.AZURE_OPENAI_API_KEY ||
@@ -192,7 +197,6 @@ const server = createServer(async (req, res) => {
       const run: RunRecord = {
         id,
         lane: body.lane,
-        humanDecision,
         status: "queued",
         startedAt: new Date().toISOString(),
         events: [],
@@ -206,6 +210,36 @@ const server = createServer(async (req, res) => {
       activeRunId = id;
       sendJson(res, 202, { id, status: run.status });
       setImmediate(() => void executeRun(run));
+    } catch (error) {
+      sendJson(res, 400, { error: error instanceof Error ? error.message : "Invalid request" });
+    }
+    return;
+  }
+
+  const decisionMatch = url.pathname.match(/^\/api\/runs\/([0-9a-f-]+)\/decision$/i);
+  if (req.method === "POST" && decisionMatch) {
+    const run = runs.get(decisionMatch[1] ?? "");
+    if (!run) {
+      sendJson(res, 404, { error: "Run not found" });
+      return;
+    }
+    if (run.status !== "awaiting_approval" || !run.resolveDecision) {
+      sendJson(res, 409, { error: "This run is not awaiting an engineering decision" });
+      return;
+    }
+    try {
+      const body = (await readJson(req)) as { decision?: HumanDecision };
+      if (!body.decision || !decisions.has(body.decision)) {
+        sendJson(res, 400, { error: "decision must be approved, changes_requested, or rejected" });
+        return;
+      }
+      const resolveDecision = run.resolveDecision;
+      run.resolveDecision = undefined;
+      run.status = "running";
+      broadcast(run, "approval_resolved", { decision: body.decision });
+      broadcast(run, "status", { status: run.status });
+      sendJson(res, 200, { id: run.id, status: run.status, decision: body.decision });
+      resolveDecision(body.decision);
     } catch (error) {
       sendJson(res, 400, { error: error instanceof Error ? error.message : "Invalid request" });
     }
@@ -227,6 +261,10 @@ const server = createServer(async (req, res) => {
     });
     res.write(": connected\n\n");
     for (const event of run.events) sse(res, "trace", event);
+    if (run.status === "awaiting_approval" && run.decisionPackage) {
+      sse(res, "status", { status: run.status });
+      sse(res, "approval_required", run.decisionPackage);
+    }
     if (run.status === "completed" || run.status === "failed") {
       sse(res, "complete", terminalPayload(run));
       res.end();

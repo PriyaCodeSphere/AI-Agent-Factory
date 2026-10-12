@@ -12,7 +12,12 @@
 import { writeFile } from "node:fs/promises";
 
 import { erpState, resetErp } from "./erp/store.ts";
-import { resolveException, type HumanDecision, type LaneResult } from "./orchestrator.ts";
+import {
+  resolveException,
+  type HumanDecision,
+  type HumanDecisionProvider,
+  type LaneResult,
+} from "./orchestrator.ts";
 import { emit, printSummary, resetTrace, traceAsJson } from "./trace.ts";
 
 export type LaneName = "lane-a" | "lane-b" | "refusal";
@@ -44,6 +49,7 @@ export async function runLane(
   lane: LaneName,
   humanDecision?: HumanDecision,
   traceOutDir?: string,
+  requestHumanDecision?: HumanDecisionProvider,
 ): Promise<LaneResult> {
   resetErp();
   resetTrace();
@@ -91,7 +97,7 @@ export async function runLane(
       break;
   }
 
-  const result = await resolveException({ exceptionId, humanDecision });
+  const result = await resolveException({ exceptionId, humanDecision, requestHumanDecision });
 
   emit({ kind: "note", text: "" });
   emit({ kind: "note", text: `OUTCOME: ${result.outcome}${result.path ? ` via ${result.path}` : ""}` });

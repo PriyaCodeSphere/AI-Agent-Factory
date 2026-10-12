@@ -38,9 +38,10 @@ npm start
 ```
 
 Then open [http://localhost:3000](http://localhost:3000). The UI lets you select any of the three lanes,
-choose the Lane B engineering decision, watch every agent/tool/decision event live, and review the final
-run metrics. Azure credentials remain on the server and are never sent to the browser. Runs are serialised
-because the demo ERP is intentionally an in-memory fixture.
+watch every agent/tool/decision event live, and review the final run metrics. Lane B pauses at FR-10,
+displays the engineering decision package, and waits for a person to approve, request changes, or reject
+before the workflow can continue. Azure credentials remain on the server and are never sent to the browser.
+Runs are serialised because the demo ERP is intentionally an in-memory fixture.
 
 Set `PORT` to use a port other than 3000. For a shared deployment, set `DEMO_PASSWORD` and optionally
 `DEMO_USERNAME` (defaults to `demo`) to protect the site with browser Basic Authentication.

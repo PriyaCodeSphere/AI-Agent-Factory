@@ -79,6 +79,16 @@ const PATH_DEFINITIONS: Record<CorrectivePath, string> = {
 
 export type HumanDecision = "approved" | "changes_requested" | "rejected";
 
+export interface HumanDecisionPackage {
+  exceptionId: string;
+  affectedMaterial: string;
+  proposedSubstitute: string;
+  engineeringSupportAvailable: string;
+  gapsForEngineering: string[];
+}
+
+export type HumanDecisionProvider = (decisionPackage: HumanDecisionPackage) => Promise<HumanDecision>;
+
 export interface LaneResult {
   outcome: "resolved_or_reduced" | "still_unresolved" | "escalated";
   detail: string;
@@ -225,7 +235,7 @@ type CorrectiveResult = { summary: string } | { halt: LaneResult };
 async function executeCorrectivePath(
   path: CorrectivePath,
   exception: NonNullable<ReturnType<typeof findException>>,
-  humanDecision: HumanDecision,
+  requestHumanDecision: HumanDecisionProvider,
 ): Promise<CorrectiveResult> {
   const context =
     `Exception ${exception.exceptionId}: ${exception.shortageQty} units of ${exception.material} short at ` +
@@ -317,12 +327,26 @@ async function executeCorrectivePath(
       if (prep.status === "escalated") return { halt: escalatedResult("Substitution preparation", prep) };
 
       // FR-10 ─ The one human gate in the future state.
+      const decisionPackage: HumanDecisionPackage = {
+        exceptionId: exception.exceptionId,
+        affectedMaterial: prep.result.affectedMaterial,
+        proposedSubstitute: prep.result.proposedSubstitute,
+        engineeringSupportAvailable: prep.result.engineeringSupportAvailable,
+        gapsForEngineering: prep.result.gapsForEngineering,
+      };
+
       emit({
         kind: "human_gate",
         fr: "FR-10",
         gate: "Approve the proposed new material substitution",
         actor: "Engineering",
-        outcome: `${humanDecision} — ${prep.result.proposedSubstitute} for ${prep.result.affectedMaterial}`,
+        outcome: `Awaiting decision — ${prep.result.proposedSubstitute} for ${prep.result.affectedMaterial}`,
+      });
+
+      const humanDecision = await requestHumanDecision(decisionPackage);
+      emit({
+        kind: "note",
+        text: `Engineering decision at FR-10: ${humanDecision.replace("_", " ")}.`,
       });
 
       if (humanDecision !== "approved") {
@@ -442,6 +466,7 @@ async function executeCorrectivePath(
 export async function resolveException(opts: {
   exceptionId: string;
   humanDecision?: HumanDecision;
+  requestHumanDecision?: HumanDecisionProvider;
 }): Promise<LaneResult> {
   const exception = findException(opts.exceptionId);
   if (!exception) return { outcome: "escalated", detail: `Unknown exception ${opts.exceptionId}` };
@@ -521,7 +546,9 @@ export async function resolveException(opts: {
   }
 
   // FR-05..FR-16 ─ Corrective action. Only the routed branch runs.
-  const corrective = await executeCorrectivePath(path, exception, opts.humanDecision ?? "approved");
+  const requestHumanDecision: HumanDecisionProvider =
+    opts.requestHumanDecision ?? (async () => opts.humanDecision ?? "approved");
+  const corrective = await executeCorrectivePath(path, exception, requestHumanDecision);
   if ("halt" in corrective) return { ...corrective.halt, path };
   const correctiveSummary = corrective.summary;
 

@@ -57,13 +57,6 @@
           </div>
 
           <div class="run-controls">
-            <label id="decision-control">Engineering decision
-              <select id="human-decision">
-                <option value="approved">Approve substitution</option>
-                <option value="changes_requested">Request changes</option>
-                <option value="rejected">Reject substitution</option>
-              </select>
-            </label>
             <button class="run-button" id="run-button" type="button"><span>Run live scenario</span><span aria-hidden="true">→</span></button>
           </div>
         </section>
@@ -81,6 +74,26 @@
             <div><span>Escalations</span><strong id="metric-escalations">—</strong></div>
             <div><span>Agent time</span><strong id="metric-time">—</strong></div>
           </div>
+
+          <section class="approval-panel" id="approval-panel" aria-labelledby="approval-title" hidden>
+            <div class="approval-heading">
+              <div><p class="eyebrow">FR-10 / HUMAN DECISION</p><h3 id="approval-title">Engineering approval required</h3></div>
+              <span class="approval-state">Workflow paused</span>
+            </div>
+            <dl class="decision-package">
+              <div><dt>Exception</dt><dd id="approval-exception"></dd></div>
+              <div><dt>Affected material</dt><dd id="approval-material"></dd></div>
+              <div><dt>Proposed substitute</dt><dd id="approval-substitute"></dd></div>
+              <div class="wide"><dt>Engineering evidence</dt><dd id="approval-support"></dd></div>
+              <div class="wide"><dt>Items for engineering review</dt><dd><ul id="approval-gaps"></ul></dd></div>
+            </dl>
+            <div class="approval-actions">
+              <button class="decision-button reject" data-decision="rejected" type="button">Reject</button>
+              <button class="decision-button changes" data-decision="changes_requested" type="button">Request changes</button>
+              <button class="decision-button approve" data-decision="approved" type="button">Approve</button>
+            </div>
+            <p class="approval-error" id="approval-error" role="alert"></p>
+          </section>
 
           <div class="trace-panel">
             <div class="trace-header"><span><i></i>LIVE EVENT STREAM</span><span id="run-status">Ready</span></div>

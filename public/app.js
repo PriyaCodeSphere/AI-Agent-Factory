@@ -1,17 +1,16 @@
-const state = { lane: "lane-a", running: false, source: null };
+const state = { lane: "lane-a", running: false, source: null, runId: null };
 const $ = (selector) => document.querySelector(selector);
 
 const cards = [...document.querySelectorAll(".scenario-card")];
-const decisionControl = $("#decision-control");
 const runButton = $("#run-button");
 const timeline = $("#timeline");
 const emptyState = $("#empty-state");
 const runStatus = $("#run-status");
+const approvalPanel = $("#approval-panel");
 
 function setLane(lane) {
   state.lane = lane;
   cards.forEach((card) => card.classList.toggle("selected", card.dataset.lane === lane));
-  decisionControl.classList.toggle("visible", lane === "lane-b");
 }
 
 cards.forEach((card) => card.addEventListener("click", () => !state.running && setLane(card.dataset.lane)));
@@ -61,6 +60,47 @@ function resetTrace() {
   setMetrics(null);
   runStatus.textContent = "Ready";
   runStatus.className = "";
+  approvalPanel.hidden = true;
+  $("#approval-error").textContent = "";
+}
+
+function showApproval(decisionPackage) {
+  $("#approval-exception").textContent = decisionPackage.exceptionId;
+  $("#approval-material").textContent = decisionPackage.affectedMaterial;
+  $("#approval-substitute").textContent = decisionPackage.proposedSubstitute;
+  $("#approval-support").textContent = decisionPackage.engineeringSupportAvailable;
+  $("#approval-gaps").innerHTML = decisionPackage.gapsForEngineering
+    .map((gap) => `<li>${escapeHtml(gap)}</li>`)
+    .join("");
+  approvalPanel.hidden = false;
+  approvalPanel.querySelectorAll("button").forEach((button) => (button.disabled = false));
+  runStatus.textContent = "Awaiting approval";
+  runStatus.className = "awaiting";
+  runButton.querySelector("span").textContent = "Waiting for engineering";
+  approvalPanel.scrollIntoView({ behavior: "smooth", block: "center" });
+}
+
+async function submitDecision(decision) {
+  if (!state.runId) return;
+  const buttons = [...approvalPanel.querySelectorAll("button")];
+  buttons.forEach((button) => (button.disabled = true));
+  $("#approval-error").textContent = "";
+  try {
+    const response = await fetch(`/api/runs/${state.runId}/decision`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ decision }),
+    });
+    const payload = await response.json();
+    if (!response.ok) throw new Error(payload.error || "Unable to submit decision");
+    approvalPanel.hidden = true;
+    runStatus.textContent = "Running";
+    runStatus.className = "running";
+    runButton.querySelector("span").textContent = "Agents working…";
+  } catch (error) {
+    $("#approval-error").textContent = error.message;
+    buttons.forEach((button) => (button.disabled = false));
+  }
 }
 
 function finish(payload) {
@@ -74,6 +114,8 @@ function finish(payload) {
   if (payload.error) addEvent({ kind: "escalation", nfr: "SERVER", reason: payload.error });
   state.source?.close();
   state.source = null;
+  state.runId = null;
+  approvalPanel.hidden = true;
 }
 
 async function startRun() {
@@ -90,15 +132,20 @@ async function startRun() {
     const response = await fetch("/api/runs", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ lane: state.lane, humanDecision: $("#human-decision").value }),
+      body: JSON.stringify({ lane: state.lane }),
     });
     const payload = await response.json();
     if (!response.ok) throw new Error(payload.error || "Unable to start run");
 
+    state.runId = payload.id;
     runStatus.textContent = "Running";
     const source = new EventSource(`/api/runs/${payload.id}/events`);
     state.source = source;
     source.addEventListener("trace", (message) => addEvent(JSON.parse(message.data)));
+    source.addEventListener("approval_required", (message) => showApproval(JSON.parse(message.data)));
+    source.addEventListener("approval_resolved", () => {
+      approvalPanel.hidden = true;
+    });
     source.addEventListener("complete", (message) => finish(JSON.parse(message.data)));
     source.onerror = () => {
       if (state.running && source.readyState === EventSource.CLOSED) finish({ status: "failed", error: "The live event connection closed unexpectedly." });
@@ -122,6 +169,9 @@ async function checkHealth() {
 }
 
 runButton.addEventListener("click", startRun);
+document.querySelectorAll(".decision-button").forEach((button) =>
+  button.addEventListener("click", () => submitDecision(button.dataset.decision)),
+);
 $("#clear-button").addEventListener("click", () => !state.running && resetTrace());
 setLane("lane-a");
 checkHealth();
